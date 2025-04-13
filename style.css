@@ -134,17 +134,18 @@ body {
 #content {
   height: 100%;
   padding: 2rem;
-  pointer-events: auto;
 }
 
 .coffee-shop-card {
   border: 2px solid #27272a;
   border-radius: 14px;
   background: #090909;
+  pointer-events: auto;
 }
 
 .coffee-shop-card-header img {
-  border-radius: 14px;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   width: 100%;
@@ -163,10 +164,6 @@ body {
   width: 0.75rem;
 }
 
-.coffee-shop-title div {
-  color: #94a3b8;
-}
-
 .coffee-shop-top-title {
   display: flex;
   justify-content: space-between;
@@ -176,6 +173,10 @@ body {
 .coffee-shop-top-title span {
   color: #94a3b8;
   font-size: 1.5rem;
+}
+
+.address {
+  color: #94a3b8;
 }
 
 .coffee-shop-card-content {
@@ -189,7 +190,6 @@ body {
 }
 
 .badge {
-  color: #94a3b8;
   display: inline;
   font-size: 0.75rem;
   padding: 0.2rem 0.5rem;
@@ -199,7 +199,6 @@ body {
 
 .coffee-shop-rating {
   margin-top: 1rem;
-  color: #94a3b8;
   display: flex;
   align-items: center;
   gap: 0.25rem;

@@ -30,7 +30,7 @@ function renderCoffeeShopCard(coffeeShop) {
           <h2>${coffeeShop.name}</h2>
           <span>${coffeeShop.price}</span>
         </div>
-        <div class='main-font-light'><i class='icon' data-lucide="map-pin-house"></i> ${coffeeShop.store_add1 ? coffeeShop.store_add1 + ', ' : ''}${coffeeShop.neighbourhood}</div>
+        <div class='main-font-light address'><i class='icon' data-lucide="map-pin-house"></i> ${coffeeShop.store_add1 ? coffeeShop.store_add1 + ', ' : ''}${coffeeShop.neighbourhood}</div>
       </div>
     </div>
     <div class='coffee-shop-card-content'>
