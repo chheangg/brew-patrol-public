@@ -28,9 +28,19 @@
   <body>
     <div class="main-font-regular header">
       <h1 class="main-font-bold heading-1">
-        ☕ Brew Patrol
+        <span class="emoji-logo">☕</span> Brew Patrol
       </h1>
     </div>
-    <div tabindex="-1" id="map"></div>
+    <div tabindex="-1" id="map">
+      <div class="overlay">
+        <div></div>
+        <main id="content">
+        </main>
+      </div>
+    </div>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>

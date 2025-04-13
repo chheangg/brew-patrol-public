@@ -4,21 +4,20 @@ function isGeolocationAvailable() {
   return "geolocation" in navigator;
 }
 
-function panToLocation(position) {
+function flyToLocation(position) {
   if (globalMapObj) {
-    globalMapObj.panTo(position)
+    globalMapObj.flyTo(position, 16)
   }
 }
 
-function panToCurrentLocation() {
+function flyToCurrentLocation() {
   // if geolocation is available
   if (isGeolocationAvailable()) {
     // get current position
     navigator.geolocation.getCurrentPosition((position) => {
-      console.log(position.coords)
       const { latitude, longitude } = position.coords;
       // pan to location
-      panToLocation([latitude, longitude])
+      flyToLocation([latitude, longitude])
     });
   }
 }

@@ -22,7 +22,7 @@ function main() {
     // load coffee shops marker
     loadCoffeeShopMarkers(coffeeShops, map);
     // pan to current position
-    panToCurrentLocation();
+    // panToCurrentLocation();
   }
 }
 

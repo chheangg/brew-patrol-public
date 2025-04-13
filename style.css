@@ -2,8 +2,13 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Noo'
+  color: #fafafa;
 }
+
+* { 
+  margin: 0; 
+  padding: 0; 
+} 
 
 .main-font-light {
   font-family: "Noto Sans", sans-serif;
@@ -72,14 +77,21 @@ body {
   border-bottom: 1px solid #27272a;
 }
 
+.emoji-logo {
+  font-size: 1.5rem;
+  margin-right: 0.25rem;
+}
+
 #map {
   flex-grow: 1;
   background-color: #090909;
+  position: relative;
 }
 
 .marker-icon {
   background: transparent;
   position: relative;
+  cursor: pointer;
 }
 
 .coffee-shop-icon {
@@ -91,12 +103,112 @@ body {
   text-align: center;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 }
 
 .coffee-shop-label {
   position: absolute;
   color: #fafafa;
   width: 100px;
-  left: -1rem;
+  left: 0;
+  right: 0;
   margin-top: 0.25rem;
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  /* the popup z-index */
+  z-index: 700;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  pointer-events: none;
+}
+
+#content {
+  height: 100%;
+  padding: 2rem;
+  pointer-events: auto;
+}
+
+.coffee-shop-card {
+  border: 2px solid #27272a;
+  border-radius: 14px;
+  background: #090909;
+}
+
+.coffee-shop-card-header img {
+  border-radius: 14px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  width: 100%;
+}
+
+.coffee-shop-title {
+  padding: 1rem 1rem 0 1rem;
+}
+
+.coffee-shop-title h2 {
+  font-size: 1.5rem;
+}
+
+.icon {
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
+.coffee-shop-title div {
+  color: #94a3b8;
+}
+
+.coffee-shop-top-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.coffee-shop-top-title span {
+  color: #94a3b8;
+  font-size: 1.5rem;
+}
+
+.coffee-shop-card-content {
+  padding: 1rem;
+  padding-top: 0.5rem;
+}
+
+.badge-list {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  color: #94a3b8;
+  display: inline;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: calc(infinity * 1px);
+  border: 1px solid #27272a;
+}
+
+.coffee-shop-rating {
+  margin-top: 1rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.yelp {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
 }
