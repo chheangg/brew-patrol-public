@@ -26,11 +26,24 @@
   </head>
 
   <body>
-    <div class="main-font-regular header">
+    <div class="main-font-base header">
       <h1 class="main-font-bold heading-1">
         <span class="emoji-logo">☕</span> Brew Patrol
       </h1>
     </div>
+    <main class="front-page">
+      <div class="search-overlay">
+        <div class="search-container">
+          <i data-lucide="search"></i>
+          <input 
+            id="search" 
+            class="main-font-base text-input search-input" 
+            autocomplete="off" 
+            placeholder="Search for coffee shop by name or neighborhood" 
+          />
+        </div>
+      </div>
+    </main>
     <div tabindex="-1" id="map">
       <div class="overlay">
         <div></div>

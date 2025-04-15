@@ -184,7 +184,7 @@ async function search(text = "") {
   // check if any of them is in the coffee shop name
   for(let i = 0; i < coffeeShops.length; i++) {
     // if name is includes text
-    if (coffeeShops[i].name.includes(text)) {
+    if (coffeeShops[i].name.toLowerCase().includes(text.toLowerCase())) {
       set.add(i);
       searchList.push(coffeeShops[i]);
     }
@@ -198,7 +198,7 @@ async function search(text = "") {
       continue;
     }
     // if levenshtein between search input and coffee name is lte 5
-    if (levenshteinDistance(text, coffeeShops[i].name, 5)) {
+    if (levenshteinDistance(text.toLowerCase(), coffeeShops[i].name.toLowerCase(), 5)) {
       set.add(i);
       searchList.push(coffeeShops[i]);
     }
@@ -212,7 +212,7 @@ async function search(text = "") {
       continue;
     }
     // if levenshtein between search input and coffee name is lte 3
-    if (levenshteinDistance(text, coffeeShops[i].neighbourhood, 3)) {
+    if (levenshteinDistance(text.toLowerCase(), coffeeShops[i].neighbourhood.toLowerCase(), 3)) {
       set.add(i);
       searchList.push(coffeeShops[i]);
     }

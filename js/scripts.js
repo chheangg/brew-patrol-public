@@ -1,4 +1,4 @@
-function main() {
+function loadMap() {
   window.onload = async () => {
     // render los angeles
     const map = L.map('map', {
@@ -26,6 +26,9 @@ function main() {
     // search
     search();
   }
+}
+
+function main() {
 }
 
 // call main
