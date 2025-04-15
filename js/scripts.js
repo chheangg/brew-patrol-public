@@ -23,8 +23,12 @@ function main() {
     loadCoffeeShopMarkers(coffeeShops, map);
     // pan to current position
     // panToCurrentLocation();
+    // search
+    search();
   }
 }
 
 // call main
 main();
+
+getAllNeighborhoods();

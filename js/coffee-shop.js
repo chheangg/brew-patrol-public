@@ -96,3 +96,75 @@ async function loadCoffeeShopMarkers(coffeeShops) {
     L.conditionalMarkers(markers).addTo(globalMapObj);
   }
 }
+
+async function getNeighbourhoods() {
+  // use fetch api to grab data from json
+  const response = await fetch('../data/neighborhoods.json')
+  // return json as array of obj
+  return await response.json();
+}
+
+/**
+ * 
+ * @param {string} text1 of size m
+ * @param {string} text2 of size n
+ */
+function levenshteinDistance(text1, text2) {
+  // create array of size m + 1 x n + 1, fill it with 0
+  const array = 
+    (new Array(text1.length + 1).fill(0))
+    .map(() => new Array(text2.length + 1).fill(0));
+
+  // set first col to the index
+  for (let i = 1; i < array.length; i++) {
+    array[i][0] = i;
+  }
+
+  // set first row to the index
+  for (let i = 1; i < array[0].length; i++) {
+    array[0][i] = i;
+  }
+
+  // create editCost
+  let editCost = 0;
+
+  // now iterate through the whole array from index 1, 1
+  for (let i = 1; i < array.length; i++) {
+    for (let j = 1; j < array[0].length; j++) {
+      // if both letter are the same
+      if (text1[i - 1] === text2[j - 1]) {
+        editCost = 0;
+      } 
+      // else
+      else {
+        editCost = 1;
+      }
+
+      // set the cost in our dps, find the min
+      array[i][j] = Math.min(
+        array[i - 1][j] + 1,
+        array[i][j - 1] + 1,
+        array[i - 1][j - 1] + editCost
+      );
+    }
+  }
+
+  console.log(array)
+
+  // return the answer
+  return array[array.length - 1][array[0].length - 1];
+}
+
+/**
+ * Implement custom search, return the items in the the two orders:
+ * - direct subsequence in coffee shop name
+ * - common subsequence of coffee shop name with a <= 5 differences
+ * - common subsequence of neighborhood name with a <= 3 differences
+ * * prevent any searches until there's three letters
+ * * filter any direct matches
+ * * stop searches early in common sequence IF it's above the threshold
+ * * implement caches in search
+ */
+async function search(text) {
+  console.log(levenshteinDistance("baa baa black sheep", "baa baa black sheep"));
+}
