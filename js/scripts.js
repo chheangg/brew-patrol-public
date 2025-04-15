@@ -30,5 +30,3 @@ function main() {
 
 // call main
 main();
-
-getAllNeighborhoods();

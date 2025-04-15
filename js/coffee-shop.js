@@ -109,7 +109,11 @@ async function getNeighbourhoods() {
  * @param {string} text1 of size m
  * @param {string} text2 of size n
  */
-function levenshteinDistance(text1, text2) {
+function levenshteinDistance(text1, text2, threshold) {
+  // if length of both text exceed threshold
+  if (Math.abs(text1.length - text2.length) > threshold) {
+    return false;
+  }
   // create array of size m + 1 x n + 1, fill it with 0
   const array = 
     (new Array(text1.length + 1).fill(0))
@@ -149,10 +153,8 @@ function levenshteinDistance(text1, text2) {
     }
   }
 
-  console.log(array)
-
-  // return the answer
-  return array[array.length - 1][array[0].length - 1];
+  // return if it's within reasonable threshold
+  return array[array.length - 1][array[0].length - 1] <= threshold;
 }
 
 /**
@@ -165,6 +167,57 @@ function levenshteinDistance(text1, text2) {
  * * stop searches early in common sequence IF it's above the threshold
  * * implement caches in search
  */
-async function search(text) {
-  console.log(levenshteinDistance("baa baa black sheep", "baa baa black sheep"));
+async function search(text = "") {
+  // if text length is lt 3, return empty
+  if (text.length < 3) {
+    return [];
+  }
+  // get coffeeShops
+  const coffeeShops = await getCoffeeShops();
+  
+  // create searchList
+  const searchList = [];
+
+  // create set for checking seen element
+  const set = new Set();
+
+  // check if any of them is in the coffee shop name
+  for(let i = 0; i < coffeeShops.length; i++) {
+    // if name is includes text
+    if (coffeeShops[i].name.includes(text)) {
+      set.add(i);
+      searchList.push(coffeeShops[i]);
+    }
+  }
+
+  // check if any of them has a edit distance of lte 5 in names
+  for(let i = 0; i < coffeeShops.length; i++) {
+    // if index is already seen
+    if (set.has(i)) {
+      // continue
+      continue;
+    }
+    // if levenshtein between search input and coffee name is lte 5
+    if (levenshteinDistance(text, coffeeShops[i].name, 5)) {
+      set.add(i);
+      searchList.push(coffeeShops[i]);
+    }
+  }
+
+  // check if any of them has a edit distance of lte 3 in neighborhood
+  for(let i = 0; i < coffeeShops.length; i++) {
+    // if index is already seen
+    if (set.has(i)) {
+      // continue
+      continue;
+    }
+    // if levenshtein between search input and coffee name is lte 3
+    if (levenshteinDistance(text, coffeeShops[i].neighbourhood, 3)) {
+      set.add(i);
+      searchList.push(coffeeShops[i]);
+    }
+  }
+
+  // return searchList
+  return searchList;
 }
