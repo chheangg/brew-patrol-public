@@ -28,8 +28,42 @@ function loadMap() {
   }
 }
 
-function main() {
 
+function renderFrontPageCoffeeShopList(coffeeShops = []) {
+  const frontPageList = document.querySelector('.front-page-list');
+  const coffeeShopCards = coffeeShops.map(cf => renderCoffeeShopCard(cf));
+  frontPageList.innerHTML = '';
+  coffeeShopCards.forEach(cf => frontPageList.appendChild(cf));
+  // generate icon
+  lucide.createIcons();
+}
+
+// https://www.freecodecamp.org/news/javascript-debounce-example/
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { fn.apply(this, args); }, delay);
+  };
+}
+
+const worker = new Worker("./js/worker.js");
+  
+worker.onmessage = async (e) => {
+  renderFrontPageCoffeeShopList(e.data)
+}
+
+async function handleSearch(e) {
+  worker.postMessage(e.target.value)
+}
+
+const debouncedHandleSearch = debounce((e) => handleSearch(e), 300)
+
+async function main() {
+  // select search-input
+  const searchInput = document.querySelector('.search-input');
+  // add onSearch function to search-input
+  searchInput.addEventListener('input', debouncedHandleSearch)
 }
 
 // call main

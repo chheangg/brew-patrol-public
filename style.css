@@ -150,6 +150,7 @@ body {
   border-radius: 14px;
   background: #090909;
   pointer-events: auto;
+  font-family: "Noto Sans", sans-serif;
 }
 
 .coffee-shop-card-header img {
@@ -207,6 +208,8 @@ body {
 }
 
 .coffee-shop-rating {
+  font-weight: 400;
+  font-size: 1rem;
   margin-top: 1rem;
   display: flex;
   align-items: center;
@@ -272,6 +275,14 @@ body {
 
 .front-page-title {
   margin-top: 100px;
+}
+
+.front-page-list {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  list-style-type: none;
 }
 
 .container {
