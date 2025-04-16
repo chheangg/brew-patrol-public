@@ -262,8 +262,9 @@ body {
   position: absolute;
   inset: 0;
   display: flex;
-  justify-content: center;
-  align-items: start;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
   background: transparent;
 }
 
@@ -346,6 +347,50 @@ body {
 
 .container {
   padding: 0 1rem;
+}
+
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  pointer-events: all;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.filter select, #distance {
+  border: 1px solid #27272a;
+  border-radius: 4px;
+  outline: 0;
+  width: 3.5rem;
+  padding: 0 0.25rem;
+}
+
+.filter-input {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  user-select: none;
+  background-color: transparent;
+  background: #171717;
+  border: 2px solid #27272a;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.filter-input svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.filter label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rating input {
+  pointer-events: all;
 }
 
 @media (width >= 40rem) {

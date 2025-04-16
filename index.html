@@ -47,6 +47,25 @@
             <i data-lucide="arrow-up-down"></i>
           </button>
         </div>
+        <div class="main-font-light filter">
+          <div class="filter-input rating">
+            <input type="checkbox" name="rating" id="rating" />
+            <label for="rating">Rating <i data-lucide="star"></i> </label>
+          </div>
+          <div class="filter-input pricing">
+            <select id="pricing">
+              <option value="">-</option>
+              <option value="1">$</option>
+              <option value="2">$$</option>
+              <option value="3">$$$</option>
+            </select>
+            <label for=""pricing>Pricing <i data-lucide="circle-dollar-sign"></i></label>
+          </div>
+          <div class="filter-input distance">
+            <input id="distance" type="number" value="3" />
+            <label for=""distance>Radius (mi) <i data-lucide="map-pin"></i></label>
+          </div>
+        </div>
       </div>
       <main id="front-page" class="front-page container">
         <h1 class="main-font-semibold front-page-title">

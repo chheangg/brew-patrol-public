@@ -10,6 +10,16 @@ function flyToLocation(position) {
   }
 }
 
+async function getCurrentLocation() {
+  return new Promise((res, rej) => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      // pan to location
+      res({ lat: latitude, long: longitude })
+    });
+  })
+}
+
 function flyToCurrentLocation() {
   // if geolocation is available
   if (isGeolocationAvailable()) {
@@ -19,5 +29,11 @@ function flyToCurrentLocation() {
       // pan to location
       flyToLocation([latitude, longitude])
     });
+  }
+}
+
+function getCurrentViewpointCenterLocation() {
+  if (globalMapObj) {
+    return globalMapObj.getCenter();
   }
 }

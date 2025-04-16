@@ -20,6 +20,14 @@ async function loadMap() {
   const coffeeShops = await getCoffeeShops();
   // load coffee shops marker
   loadCoffeeShopMarkers(coffeeShops, map);
+
+  // handle onMoveEnd to change location
+  globalMapObj.on('moveend', () => {
+    filterOptions.location = { lat: globalMapObj.getCenter().lat, long: globalMapObj.getCenter().lng };
+  })
+
+  // pan to current location
+  flyToCurrentLocation();
 }
 
 function renderFrontPageCoffeeShopList(coffeeShops = []) {
@@ -51,18 +59,55 @@ worker.onmessage = async (e) => {
   renderFrontPageCoffeeShopList(e.data)
 }
 
+let filterOptions = {
+  byRatingAndRelevancy: false,
+  byLocation: true,
+  byNeighbourhood: false,
+  byPricing: false,
+  distance: 3,
+  pricing: null,
+}
+
+function getHeightOfMapBound() {
+  if (globalMapObj) {
+    const sw = globalMapObj.getBounds().getSouthWest();
+    const ne = globalMapObj.getBounds().getNorthEast();
+    return (ne.lat - sw.lat) / 2;
+  }
+}
+
 // post message to worker
 async function handleSearch(e) {
   // if event is enter
   if (e.key === 'Enter' || e.keyCode === 13) {
-    worker.postMessage({ text: e.target.value, byLocation: true })
+    worker.postMessage({ 
+      text: e.target.value, 
+      ...filterOptions,
+      location: globalMapObj ? { lat: globalMapObj.getCenter().lat, long: globalMapObj.getCenter().lng } : await getCurrentLocation(),
+      distance: 
+        filterOptions.distance 
+        ?
+        filterOptions.distance
+        :
+        getHeightOfMapBound()
+      })
   }
 }
 
 // for search cnlick
 async function handleSearchClick(e) {
   const searchInput = document.querySelector('.search-input');
-  worker.postMessage({ text: searchInput.value, byLocation: true })
+  worker.postMessage({ 
+    text: e.target.value, 
+    ...filterOptions,
+    location: globalMapObj ? globalMapObj.getCenter() : await getCurrentLocation(),
+    distance: 
+      filterOptions.distance 
+      ?
+      filterOptions.distance
+      :
+      getHeightOfMapBound()
+    })
 }
 
 async function handleToggle() {
@@ -79,8 +124,26 @@ async function handleToggle() {
   }
 }
 
+
 // debounce it just in case, 300 ms
 const debouncedHandleSearch = debounce((e) => handleSearch(e), 300)
+const debouncedHandleSearchClick = debounce((e) => handleSearchClick(e), 300)
+
+function handleRating(e) {
+  filterOptions.byRatingAndRelevancy = e.target.value
+  console.log(filterOptions)
+}
+
+function handlePricing(e) {
+  filterOptions.byPricing = e.target.value !== '';
+  filterOptions.pricing = e.target.value;
+  console.log(filterOptions)
+}
+
+function handleDistance(e) {
+  filterOptions.distance = parseFloat(e.target.value);
+  console.log(filterOptions)
+}
 
 async function main() {
   // select search-input
@@ -90,12 +153,24 @@ async function main() {
   // select search btn
   const searchBtn = document.querySelector('.search-btn');
   // add handleSearchCLick function to search-btn
-  searchBtn.addEventListener('click', handleSearchClick);
+  searchBtn.addEventListener('click', debouncedHandleSearchClick);
 
   // select toggle-btn
   const toggleBtn = document.querySelector('.toggle-btn');
   // add handleToggle event function to toggle-btn
   toggleBtn.addEventListener('click', handleToggle)
+
+  // select rating
+  const ratingInput = document.querySelector('#rating');
+  ratingInput.addEventListener('input', handleRating)
+
+  // select pricing
+  const pricingInput = document.querySelector('#pricing');
+  pricingInput.addEventListener('input', handlePricing)
+
+  // select by Location
+  const distanceInput = document.querySelector('#distance');
+  distanceInput.addEventListener('input', handleDistance)
 }
 
 // call main

@@ -1,5 +1,4 @@
 // just a simple hashMap for caching
-const cache = {}
 let coffeeShops;
 let neighbourhoods;
 
@@ -105,7 +104,6 @@ function bayesAvg(rating, review_count, coffeeShops) {
 }
 
 function isClose(c, cf, d) {
-  console.log(c, cf, d)
   // 1 mile = 69 deg
   return ((c.lat - cf.lat) ** 2 + (c.long - cf.long) ** 2) <= (d / 69) ** 2
 }
@@ -156,11 +154,13 @@ function filterCoffeeShops({
   else if (byLocation) {
     filteredCoffeeShops =
     filteredCoffeeShops
-        .filter(cf => isClose(location, { lat: cf.lat, long: cf.long }, distance))
+        .filter(cf => {
+          if (cf.name === 'Cafe 100') {
+            console.log(cf, location, isClose(location, { lat: cf.lat, long: cf.long }, distance))
+          }
+          return isClose(location, { lat: cf.lat, long: cf.long }, distance)
+        })
   } 
-
-  
-  console.log(filteredCoffeeShops)
 
 
   // if byPricing
@@ -196,12 +196,6 @@ async function search({
   // if text length is lt 3, return empty
   if (text.length < 3 && !byLocation) {
     return [];
-  }
-
-  // if it exists in cache
-  if (text.toLocaleLowerCase() in cache) {
-    // return it immediately
-    return cache[text.toLocaleLowerCase()];
   }
 
   // get neighbourhoods
@@ -244,19 +238,21 @@ async function search({
   // create set for checking seen element
   const set = new Set();
   // check if any of them has text as a subset of it
-  for(let i = 0; i < filteredCoffeeShops.length; i++) {
-    // if levenshtein between search input and coffee name is lte 3
-    if (
-      filteredCoffeeShops[i].name.toLowerCase().includes(text.toLowerCase())
-      ||
-      (byNeighbourhood && (filteredCoffeeShops[i].neighbourhood === selectedNeighbourhood))
-    ) {
-      set.add(i);
-      searchList.push(filteredCoffeeShops[i]);
+  if (text) {
+    for(let i = 0; i < filteredCoffeeShops.length; i++) {
+      // if levenshtein between search input and coffee name is lte 3
+      if (
+        filteredCoffeeShops[i].name.toLowerCase().includes(text.toLowerCase())
+        ||
+        (byNeighbourhood && (filteredCoffeeShops[i].neighbourhood === selectedNeighbourhood))
+      ) {
+        set.add(i);
+        searchList.push(filteredCoffeeShops[i]);
+      }
     }
+  } else {
+    searchList = filteredCoffeeShops
   }
-  
-  cache[text] = searchList;
 
   // return searchList
   return searchList;
