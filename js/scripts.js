@@ -1,3 +1,5 @@
+let isMapToggled = false;
+
 async function loadMap() {
   // render los angeles
   const map = L.map('map', {
@@ -55,8 +57,16 @@ const worker = new Worker("./js/worker.js");
   
 // on receiving any data from worker
 worker.onmessage = async (e) => {
+  currentSearchList = e.data;
   // render it
   renderFrontPageCoffeeShopList(e.data)
+  currentIndex = 0;
+
+  // if toggled
+  if (isMapToggled && currentSearchList) {
+    // render list
+    renderCoffeeShopListOnMap()
+  }
 }
 
 let filterOptions = {
@@ -74,6 +84,47 @@ function getHeightOfMapBound() {
     const ne = globalMapObj.getBounds().getNorthEast();
     return (ne.lat - sw.lat) / 2;
   }
+}
+
+let currentIndex = 0;
+let currentSearchList = [];
+
+function renderCoffeeShopListOnMap() {
+  const currentCoffeeShop = currentSearchList[currentIndex];
+  const leftBtn = document.createElement('button');
+  leftBtn.innerHTML = '<i data-lucide="chevron-left"></i>'
+  leftBtn.className = 'left-btn btn';
+  const rightBtn = document.createElement('button');
+  rightBtn.innerHTML = '<i data-lucide="chevron-right"></i>'
+  rightBtn.className = 'right-btn btn';
+
+  leftBtn.addEventListener('click', (e) => {
+    currentIndex--;
+    renderCoffeeShopListOnMap();
+  })
+
+  rightBtn.addEventListener('click', (e) => {
+    currentIndex++;
+    renderCoffeeShopListOnMap();
+  })
+
+  unrenderCoffeeShopCard();
+  const content = document.querySelector('#content')
+
+  content.appendChild(
+    renderCoffeeShopCard(
+      currentCoffeeShop,
+      currentIndex > 0 ? leftBtn : null,
+      currentIndex < currentSearchList.length - 1 ? rightBtn : null
+    )
+  )
+
+  lucide.createIcons();
+  
+  const lat = currentCoffeeShop.lat;
+  const lng = currentCoffeeShop.long;
+  // fly to position
+  flyToLocation([lat, lng])
 }
 
 // post message to worker
@@ -108,6 +159,12 @@ async function handleSearchClick(e) {
       :
       getHeightOfMapBound()
     })
+
+  // if toggled
+  if (isMapToggled) {
+    // render list
+    renderCoffeeShopListOnMap()
+  }
 }
 
 async function handleToggle() {
@@ -122,6 +179,13 @@ async function handleToggle() {
   if (!globalMapObj) {
     loadMap();
   }
+  // if it wasn't toggled
+  if (!isMapToggled && currentSearchList.length > 0) {
+    // render list
+    renderCoffeeShopListOnMap()
+  }
+
+  isMapToggled = !isMapToggled
 }
 
 
@@ -131,18 +195,15 @@ const debouncedHandleSearchClick = debounce((e) => handleSearchClick(e), 300)
 
 function handleRating(e) {
   filterOptions.byRatingAndRelevancy = e.target.value
-  console.log(filterOptions)
 }
 
 function handlePricing(e) {
   filterOptions.byPricing = e.target.value !== '';
   filterOptions.pricing = e.target.value;
-  console.log(filterOptions)
 }
 
 function handleDistance(e) {
   filterOptions.distance = parseFloat(e.target.value);
-  console.log(filterOptions)
 }
 
 async function main() {

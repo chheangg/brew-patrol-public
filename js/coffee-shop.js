@@ -24,10 +24,17 @@ function renderImageAsync(url) {
   return asyncImgElement;
 }
 
-function renderCoffeeShopCard(coffeeShop) {
+
+function unrenderCoffeeShopCard() {
+  const content = document.querySelector('#content')
+  content.innerHTML = "";
+  console.log('hey')
+}
+
+function renderCoffeeShopCard(coffeeShop, prev, next) {
   // https://stackoverflow.com/questions/30796141/parse-json-array-from-string
   const categories = coffeeShop
-    .categories
+    .categories 
     .replace(/[\[\]']/g,'')
     .split(',');
 
@@ -35,6 +42,7 @@ function renderCoffeeShopCard(coffeeShop) {
   cardContainer.className = 'coffee-shop-card';
 
   cardContainer.innerHTML = `
+    <button class='close btn' role="close"><i data-lucide="x"></i></button>
     <div class='coffee-shop-card-header main-font-semibold'>
       <div class='img-container'></div>
       <div class='coffee-shop-title'>
@@ -65,15 +73,34 @@ function renderCoffeeShopCard(coffeeShop) {
     </div>
   `
 
+  const closeBtn = cardContainer.querySelector('.close');
+  closeBtn.addEventListener('click', unrenderCoffeeShopCard);
+
   const asyncImgElement = renderImageAsync(coffeeShop.image_url)
   const imgContainer = cardContainer.querySelector('.img-container');
   imgContainer.appendChild(asyncImgElement)
-  return cardContainer
+
+  const cardWrapper = document.createElement('div');
+  cardWrapper.className = 'card-wrapper';
+
+  const pagination = document.createElement('div');
+  pagination.className = 'pagination'
+
+  cardWrapper.appendChild(cardContainer)
+  cardWrapper.appendChild(pagination);
+  pagination.appendChild(prev || document.createElement('div'));
+  pagination.appendChild(next || document.createElement('div'));
+  return cardWrapper
+}
+
+function onClickOut() {
+  unrenderCoffeeShopCard();
 }
 
 function onClickCoffeeShopMarker(coffeeShop) {
   // render coffee shop card
   const content = document.querySelector('#content')
+  content.innerHTML = "";
   const coffeeShopCard = renderCoffeeShopCard(coffeeShop);
   content.replaceChildren(coffeeShopCard);
   // pan to it
