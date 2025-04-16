@@ -7,7 +7,7 @@ async function getCoffeeShops() {
     return coffeeShops
   }
   // use fetch api to grab data from json
-  const response = await fetch('../data/coffee_shop.json')
+  const response = await fetch('https://chheangg.github.io/brew-patrol/data/coffee_shop.json')
   coffeeShops = await response.json();
   // return json as array of obj
   return coffeeShops;
@@ -28,7 +28,6 @@ function renderImageAsync(url) {
 function unrenderCoffeeShopCard() {
   const content = document.querySelector('#content')
   content.innerHTML = "";
-  console.log('hey')
 }
 
 function renderCoffeeShopCard(coffeeShop, prev, next) {
@@ -142,18 +141,8 @@ async function loadCoffeeShopMarkers(coffeeShops) {
 
 async function getNeighbourhoods() {
   // use fetch api to grab data from json
-  const response = await fetch('../data/neighbourhoods.json')
+  const response = await fetch('https://chheangg.github.io/brew-patrol/data/neighbourhoods.json')
   // return json as array of obj
   return await response.json();
 }
 
-async function getCoffeeShops() {
-  if (coffeeShops) {
-    return coffeeShops
-  }
-  // use fetch api to grab data from json
-  const response = await fetch('../data/coffee_shop.json')
-  coffeeShops = await response.json();
-  // return json as array of obj
-  return coffeeShops;
-}

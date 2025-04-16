@@ -34,9 +34,18 @@ async function loadMap() {
 
 function renderFrontPageCoffeeShopList(coffeeShops = []) {
   const frontPageList = document.querySelector('.front-page-list');
-  const coffeeShopCards = coffeeShops.map(cf => renderCoffeeShopCard(cf));
+  const coffeeShopCards = coffeeShops.map(cf => {
+    const card = renderCoffeeShopCard(cf);
+    card.addEventListener('click', () => {
+      handleToggle().then(() => {
+        renderCoffeeShopCard(cf)
+      })
+    })
+    return card;
+  });
   frontPageList.innerHTML = '';
   coffeeShopCards.forEach(cf => frontPageList.appendChild(cf));
+
   // generate icon
   lucide.createIcons();
 }
