@@ -16,12 +16,13 @@ async function getCoffeeShops() {
   return coffeeShops;
 }
 
+
 async function getNeighbourhoods() {
   if (neighbourhoods) {
     return neighbourhoods;
   }
   // use fetch api to grab data from json
-  const response = await fetch('https://chheangg.github.io/brew-patrol/data/coffee_shop.json')
+  const response = await fetch('https://chheangg.github.io/brew-patrol/data/neighbourhoods.json')
   neighbourhoods = await response.json()
   // return json as array of obj
   return neighbourhoods;

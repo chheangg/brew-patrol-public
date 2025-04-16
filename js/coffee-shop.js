@@ -138,11 +138,3 @@ async function loadCoffeeShopMarkers(coffeeShops) {
     L.conditionalMarkers(markers).addTo(globalMapObj);
   }
 }
-
-async function getNeighbourhoods() {
-  // use fetch api to grab data from json
-  const response = await fetch('https://chheangg.github.io/brew-patrol/data/neighbourhoods.json')
-  // return json as array of obj
-  return await response.json();
-}
-
