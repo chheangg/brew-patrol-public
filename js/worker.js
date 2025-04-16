@@ -155,9 +155,6 @@ function filterCoffeeShops({
     filteredCoffeeShops =
     filteredCoffeeShops
         .filter(cf => {
-          if (cf.name === 'Cafe 100') {
-            console.log(cf, location, isClose(location, { lat: cf.lat, long: cf.long }, distance))
-          }
           return isClose(location, { lat: cf.lat, long: cf.long }, distance)
         })
   } 
@@ -220,7 +217,7 @@ async function search({
   const coffeeShops = await getCoffeeShops();
 
   // get filtered coffee shops
-  const filteredCoffeeShops = filterCoffeeShops({ 
+  let filteredCoffeeShops = filterCoffeeShops({ 
     coffeeShops, 
     byRatingAndRelevancy,
     byLocation,
@@ -237,8 +234,9 @@ async function search({
 
   // create set for checking seen element
   const set = new Set();
+  console.log(text, filteredCoffeeShops)
   // check if any of them has text as a subset of it
-  if (text) {
+  if (text && filteredCoffeeShops.length > 0) {
     for(let i = 0; i < filteredCoffeeShops.length; i++) {
       // if levenshtein between search input and coffee name is lte 3
       if (
@@ -250,7 +248,25 @@ async function search({
         searchList.push(filteredCoffeeShops[i]);
       }
     }
-  } else {
+  } 
+  // otherwise if filtered is empty
+  else if (text && filteredCoffeeShops.length === 0) {
+    console.log("CALLED")
+    filteredCoffeeShops = coffeeShops
+    for(let i = 0; i < filteredCoffeeShops.length; i++) {
+      // if levenshtein between search input and coffee name is lte 3
+      if (
+        filteredCoffeeShops[i].name.toLowerCase().includes(text.toLowerCase())
+      ) {
+        set.add(i);
+        searchList.push(filteredCoffeeShops[i]);
+      }
+    }
+
+    console.log(searchList)
+  }
+  // else
+  else {
     searchList = filteredCoffeeShops
   }
 
