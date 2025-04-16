@@ -115,7 +115,7 @@ async function loadCoffeeShopMarkers(coffeeShops) {
 
 async function getNeighbourhoods() {
   // use fetch api to grab data from json
-  const response = await fetch('../data/neighborhoods.json')
+  const response = await fetch('../data/neighbourhoods.json')
   // return json as array of obj
   return await response.json();
 }

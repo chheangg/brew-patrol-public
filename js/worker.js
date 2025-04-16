@@ -1,19 +1,31 @@
 // just a simple hashMap for caching
 const cache = {}
 let coffeeShops;
+let neighbourhoods;
 
 //https://ognjen.io/formula-for-sorting-by-average-rating-and-number-of-ratings/
 
 
 async function getCoffeeShops() {
   if (coffeeShops) {
-    return coffeeShops
+    return coffeeShops;
   }
   // use fetch api to grab data from json
   const response = await fetch('../data/coffee_shop.json')
   coffeeShops = await response.json();
   // return json as array of obj
   return coffeeShops;
+}
+
+async function getNeighbourhoods() {
+  if (neighbourhoods) {
+    return neighbourhoods;
+  }
+  // use fetch api to grab data from json
+  const response = await fetch('../data/neighbourhoods.json')
+  neighbourhoods = await response.json()
+  // return json as array of obj
+  return neighbourhoods;
 }
 
 /**
@@ -101,44 +113,21 @@ function bayesAvg(rating, review_count, coffeeShops) {
  * byRatingAndRelevancy,
  * byPrice
  */
-function filterCoffeeShops(filterOptions) {
-  const {
-    coffeeShops,
-    byDistance,
-    byViewpoint,
-    byNeighbourhood,
-    disance = 5,
-    viewpoint,
-    neighborhood,
-    byRatingAndRelevancy,
-    byCheapest,
-    currentLocation = { lat: 34.0549, long: 118.24 }
-  } = filterOptions;
-
+function filterCoffeeShops({
+  coffeeShops,
+  byDistance,
+  byViewpoint,
+  byNeighbourhood,
+  byRatingAndRelevancy,
+  byPricing,
+  pricing = [1, 2, 3],
+  disance = 5,
+  viewpoint,
+  neighbourhood,
+  currentLocation = { lat: 34.0549, long: 118.24 }
+}) {
   let filteredCoffeeShops = coffeeShops;
-
-  // use byDistance
-  if (byDistance) {
-    
-  } 
-  // or byViewpoint
-  else if (byViewpoint) {
-
-  }
-  // or byNeighbourhood
-  else if (byNeighbourhood) {
-
-  }
-
-
-  // if byCheapest
-  if (byCheapest) {
-    filteredCoffeeShops = 
-      filteredCoffeeShops
-          .filter(cf => cf.price_int)
-          .sort((cf1, cf2) => cf2.price_int - cf1.price_int)
-  }
-
+  
   // if byRatingAndRelevancy
   if (byRatingAndRelevancy) {
     // reset the cache
@@ -153,21 +142,50 @@ function filterCoffeeShops(filterOptions) {
         )
   }
 
+  // use byDistance
+  if (byDistance) {
+    
+  } 
+  // or byViewpoint
+  else if (byViewpoint) {
+
+  }
+  // or byNeighbourhood
+  else if (byNeighbourhood) {
+    filteredCoffeeShops = 
+      filteredCoffeeShops
+        .filter(cf => cf.neighbourhood.toLowerCase() === neighbourhood.toLowerCase());
+  }
+
+
+  // if byPricing
+  if (byPricing) {
+    filteredCoffeeShops = 
+      filteredCoffeeShops
+          .filter(cf => cf.price_int && pricing.includes(cf.price_int))
+  }
+
   return filteredCoffeeShops;
 } 
 
 /**
  * GOOD ENOUGH SEARCH FUNCTION :D
  * Implement custom search, return the items in the the two orders:
+ * - common subsequence of neighborhood name with a <= 3 differences, then use it to filter by neighborhoods if exists
  * - a direct subsequence of coffee shop name
- * - common subsequence of neighborhood name with a <= 3 differences
  * - common subsequence of coffee shop name with a <= 5 differences
  * * prevent any searches until there's three letters
  * * filter any direct matches
  * * stop searches early in common sequence IF it's above the threshold
  * * implement caches in search
  */
-async function search(text = "") {
+async function search({ 
+  text = "", 
+  byPricing = false, 
+  byRatingAndRelevancy = false, 
+  byViewpoint = false, 
+  byDistance = false 
+}) {
   // if text length is lt 3, return empty
   if (text.length < 3) {
     return [];
@@ -179,57 +197,55 @@ async function search(text = "") {
     return cache[text.toLocaleLowerCase()];
   }
 
+  // get neighbourhoods
+  const neighbourhoods = await getNeighbourhoods();
+
+  // create selectedNeighbourhood variable
+  let selectedNeighbourhood;
+  // check if any neighborhood is referenced
+  for(let i = 0; i < neighbourhoods.length; i++) {
+    // if levenshtein between search input and neighbourhoods is lte 3
+    if (levenshteinDistance(text.toLowerCase(), neighbourhoods[i].toLowerCase(), 3)) {
+      // set selected neighborhood
+      selectedNeighbourhood = neighbourhoods[i];
+      // break
+      break;
+    }
+  }
+
   // get coffeeShops
   const coffeeShops = await getCoffeeShops();
 
   // get filtered coffee shops
-  const filteredCoffeeShops = filterCoffeeShops({ coffeeShops, byRatingAndRelevancy: true });
+  const filteredCoffeeShops = filterCoffeeShops({ 
+    coffeeShops, 
+    byPricing,
+    byRatingAndRelevancy,
+    byDistance,
+    byViewpoint,
+    byNeighbourhood: !!selectedNeighbourhood,
+    neighbourhood: selectedNeighbourhood,
+  });
   
   // create searchList
-  const searchList = [];
+  let searchList = [];
 
   // create set for checking seen element
   const set = new Set();
-
   // check if any of them has text as a subset of it
   for(let i = 0; i < filteredCoffeeShops.length; i++) {
     // if levenshtein between search input and coffee name is lte 3
-    if (filteredCoffeeShops[i].name.toLowerCase().includes(text.toLowerCase())) {
+    if (
+      filteredCoffeeShops[i].name.toLowerCase().includes(text.toLowerCase())
+      ||
+      (!!selectedNeighbourhood && (filteredCoffeeShops[i].neighbourhood === selectedNeighbourhood))
+    ) {
       set.add(i);
       searchList.push(filteredCoffeeShops[i]);
     }
   }
   
-
-  // check if any of them has a edit distance of lte 3 in neighborhood
-  for(let i = 0; i < filteredCoffeeShops.length; i++) {
-    // if index is already seen
-    if (set.has(i)) {
-      // continue
-      continue;
-    }
-    // if levenshtein between search input and coffee name is lte 3
-    if (levenshteinDistance(text.toLowerCase(), filteredCoffeeShops[i].neighbourhood.toLowerCase(), 3)) {
-      set.add(i);
-      searchList.push(coffeeShops[i]);
-    }
-  }
-
-  // check if any of them has a edit distance of lte 3 in names
-  for(let i = 0; i < filteredCoffeeShops.length; i++) {
-    // if index is already seen
-    if (set.has(i)) {
-      // continue
-      continue;
-    }
-    // if levenshtein between search input and coffee name is lte 5
-    if (levenshteinDistance(text.toLowerCase(), filteredCoffeeShops[i].name.toLowerCase(), 3)) {
-      set.add(i);
-      searchList.push(filteredCoffeeShops[i]);
-    }
-
-    cache[text] = searchList;
-  }
+  cache[text] = searchList;
 
   // return searchList
   return searchList;
