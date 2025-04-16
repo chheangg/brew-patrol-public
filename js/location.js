@@ -1,4 +1,4 @@
-let globalMapObj = null;
+let globalMapObj;
 
 function isGeolocationAvailable() {
   return "geolocation" in navigator;

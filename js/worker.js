@@ -2,6 +2,9 @@
 const cache = {}
 let coffeeShops;
 
+//https://ognjen.io/formula-for-sorting-by-average-rating-and-number-of-ratings/
+
+
 async function getCoffeeShops() {
   if (coffeeShops) {
     return coffeeShops
@@ -76,6 +79,83 @@ function levenshteinDistance(text1, text2, threshold) {
   return array[array.length - 1][array[0].length - 1] <= threshold;
 }
 
+let m = null;
+let C = null;
+
+// https://www.algolia.com/doc/guides/managing-results/must-do/custom-ranking/how-to/bayesian-average/
+function bayesAvg(rating, review_count, coffeeShops) {
+  // average rating for all stores
+  m = m ? m : coffeeShops.reduce((prev, curr) => prev + curr.rating, 0) / coffeeShops.reduce((prev, curr) => prev + curr.review_count, 0);
+  // 25th percentile's rating
+  C = C ? C : [...coffeeShops].sort((c1, c2) => c1.rating - c2.rating)[Math.floor(coffeeShops.length * 25 / 100)].review_count;
+
+  return (rating * review_count + C * m) / (review_count + C);
+}
+
+/**
+ * coffeeShops,
+ * byDistance, (cannot be turend on the same time as byViewpoint or by Neighbourhood)
+ * byViewpoint, (cannot be turned on the same time as byDistance or byNeighbourhood)
+ * byNeighbourhood, (cannot be turned on the same time as byDistance or byViewpoint)
+ * distance = [5 mi, 10 mi, 15 mi, 20 mi, custom],
+ * byRatingAndRelevancy,
+ * byPrice
+ */
+function filterCoffeeShops(filterOptions) {
+  const {
+    coffeeShops,
+    byDistance,
+    byViewpoint,
+    byNeighbourhood,
+    disance = 5,
+    viewpoint,
+    neighborhood,
+    byRatingAndRelevancy,
+    byCheapest,
+    currentLocation = { lat: 34.0549, long: 118.24 }
+  } = filterOptions;
+
+  let filteredCoffeeShops = coffeeShops;
+
+  // use byDistance
+  if (byDistance) {
+    
+  } 
+  // or byViewpoint
+  else if (byViewpoint) {
+
+  }
+  // or byNeighbourhood
+  else if (byNeighbourhood) {
+
+  }
+
+
+  // if byCheapest
+  if (byCheapest) {
+    filteredCoffeeShops = 
+      filteredCoffeeShops
+          .filter(cf => cf.price_int)
+          .sort((cf1, cf2) => cf2.price_int - cf1.price_int)
+  }
+
+  // if byRatingAndRelevancy
+  if (byRatingAndRelevancy) {
+    // reset the cache
+    m = null;
+    C = null;
+    filteredCoffeeShops = 
+      filteredCoffeeShops
+        .sort((cf1, cf2) => 
+          bayesAvg(cf2.rating, cf2.review_count, filteredCoffeeShops)
+          - 
+          bayesAvg(cf1.rating, cf1.review_count, filteredCoffeeShops) 
+        )
+  }
+
+  return filteredCoffeeShops;
+} 
+
 /**
  * GOOD ENOUGH SEARCH FUNCTION :D
  * Implement custom search, return the items in the the two orders:
@@ -101,6 +181,9 @@ async function search(text = "") {
 
   // get coffeeShops
   const coffeeShops = await getCoffeeShops();
+
+  // get filtered coffee shops
+  const filteredCoffeeShops = filterCoffeeShops({ coffeeShops, byRatingAndRelevancy: true });
   
   // create searchList
   const searchList = [];
@@ -109,40 +192,40 @@ async function search(text = "") {
   const set = new Set();
 
   // check if any of them has text as a subset of it
-  for(let i = 0; i < coffeeShops.length; i++) {
+  for(let i = 0; i < filteredCoffeeShops.length; i++) {
     // if levenshtein between search input and coffee name is lte 3
-    if (coffeeShops[i].name.toLowerCase().includes(text.toLowerCase())) {
+    if (filteredCoffeeShops[i].name.toLowerCase().includes(text.toLowerCase())) {
       set.add(i);
-      searchList.push(coffeeShops[i]);
+      searchList.push(filteredCoffeeShops[i]);
     }
   }
   
 
   // check if any of them has a edit distance of lte 3 in neighborhood
-  for(let i = 0; i < coffeeShops.length; i++) {
+  for(let i = 0; i < filteredCoffeeShops.length; i++) {
     // if index is already seen
     if (set.has(i)) {
       // continue
       continue;
     }
     // if levenshtein between search input and coffee name is lte 3
-    if (levenshteinDistance(text.toLowerCase(), coffeeShops[i].neighbourhood.toLowerCase(), 3)) {
+    if (levenshteinDistance(text.toLowerCase(), filteredCoffeeShops[i].neighbourhood.toLowerCase(), 3)) {
       set.add(i);
       searchList.push(coffeeShops[i]);
     }
   }
 
   // check if any of them has a edit distance of lte 3 in names
-  for(let i = 0; i < coffeeShops.length; i++) {
+  for(let i = 0; i < filteredCoffeeShops.length; i++) {
     // if index is already seen
     if (set.has(i)) {
       // continue
       continue;
     }
     // if levenshtein between search input and coffee name is lte 5
-    if (levenshteinDistance(text.toLowerCase(), coffeeShops[i].name.toLowerCase(), 3)) {
+    if (levenshteinDistance(text.toLowerCase(), filteredCoffeeShops[i].name.toLowerCase(), 3)) {
       set.add(i);
-      searchList.push(coffeeShops[i]);
+      searchList.push(filteredCoffeeShops[i]);
     }
 
     cache[text] = searchList;
