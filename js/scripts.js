@@ -35,12 +35,7 @@ async function loadMap() {
 function renderFrontPageCoffeeShopList(coffeeShops = []) {
   const frontPageList = document.querySelector('.front-page-list');
   const coffeeShopCards = coffeeShops.map(cf => {
-    const card = renderCoffeeShopCard(cf);
-    card.addEventListener('click', () => {
-      handleToggle().then(() => {
-        renderCoffeeShopCard(cf)
-      })
-    })
+    const card = renderCoffeeShopCard(cf, false);
     return card;
   });
   frontPageList.innerHTML = '';
@@ -123,6 +118,7 @@ function renderCoffeeShopListOnMap() {
   content.appendChild(
     renderCoffeeShopCard(
       currentCoffeeShop,
+      true,
       currentIndex > 0 ? leftBtn : null,
       currentIndex < currentSearchList.length - 1 ? rightBtn : null
     )

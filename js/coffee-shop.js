@@ -30,7 +30,7 @@ function unrenderCoffeeShopCard() {
   content.innerHTML = "";
 }
 
-function renderCoffeeShopCard(coffeeShop, prev, next) {
+function renderCoffeeShopCard(coffeeShop, isMapView = false, prev, next) {
   // https://stackoverflow.com/questions/30796141/parse-json-array-from-string
   const categories = coffeeShop
     .categories 
@@ -74,6 +74,7 @@ function renderCoffeeShopCard(coffeeShop, prev, next) {
 
   const closeBtn = cardContainer.querySelector('.close');
   closeBtn.addEventListener('click', unrenderCoffeeShopCard);
+  if (!isMapView) closeBtn.className = 'hidden'
 
   const asyncImgElement = renderImageAsync(coffeeShop.image_url)
   const imgContainer = cardContainer.querySelector('.img-container');
@@ -100,7 +101,7 @@ function onClickCoffeeShopMarker(coffeeShop) {
   // render coffee shop card
   const content = document.querySelector('#content')
   content.innerHTML = "";
-  const coffeeShopCard = renderCoffeeShopCard(coffeeShop);
+  const coffeeShopCard = renderCoffeeShopCard(coffeeShop, true);
   content.replaceChildren(coffeeShopCard);
   // pan to it
   if (globalMapObj) {
