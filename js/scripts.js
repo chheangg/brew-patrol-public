@@ -55,14 +55,14 @@ worker.onmessage = async (e) => {
 async function handleSearch(e) {
   // if event is enter
   if (e.key === 'Enter' || e.keyCode === 13) {
-    worker.postMessage({ text: e.target.value })
+    worker.postMessage({ text: e.target.value, byLocation: true })
   }
 }
 
 // for search cnlick
 async function handleSearchClick(e) {
   const searchInput = document.querySelector('.search-input');
-  worker.postMessage({ text: searchInput.value })
+  worker.postMessage({ text: searchInput.value, byLocation: true })
 }
 
 async function handleToggle() {

@@ -104,6 +104,12 @@ function bayesAvg(rating, review_count, coffeeShops) {
   return (rating * review_count + C * m) / (review_count + C);
 }
 
+function isClose(c, cf, d) {
+  console.log(c, cf, d)
+  // 1 mile = 69 deg
+  return ((c.lat - cf.lat) ** 2 + (c.long - cf.long) ** 2) <= (d / 69) ** 2
+}
+
 /**
  * coffeeShops,
  * byDistance, (cannot be turend on the same time as byViewpoint or by Neighbourhood)
@@ -115,16 +121,14 @@ function bayesAvg(rating, review_count, coffeeShops) {
  */
 function filterCoffeeShops({
   coffeeShops,
-  byDistance,
-  byViewpoint,
-  byNeighbourhood,
   byRatingAndRelevancy,
+  byLocation,
+  byNeighbourhood,
   byPricing,
-  pricing = [1, 2, 3],
-  disance = 5,
-  viewpoint,
+  location = { lat: 34.0549, long: -118.24 },
+  distance = 3,
   neighbourhood,
-  currentLocation = { lat: 34.0549, long: 118.24 }
+  pricing = [1, 2, 3]
 }) {
   let filteredCoffeeShops = coffeeShops;
   
@@ -142,20 +146,21 @@ function filterCoffeeShops({
         )
   }
 
-  // use byDistance
-  if (byDistance) {
-    
-  } 
-  // or byViewpoint
-  else if (byViewpoint) {
-
-  }
-  // or byNeighbourhood
-  else if (byNeighbourhood) {
+  // byNeighbourhood
+  if (byNeighbourhood) {
     filteredCoffeeShops = 
       filteredCoffeeShops
         .filter(cf => cf.neighbourhood.toLowerCase() === neighbourhood.toLowerCase());
   }
+  // or use byLocation
+  else if (byLocation) {
+    filteredCoffeeShops =
+    filteredCoffeeShops
+        .filter(cf => isClose(location, { lat: cf.lat, long: cf.long }, distance))
+  } 
+
+  
+  console.log(filteredCoffeeShops)
 
 
   // if byPricing
@@ -180,14 +185,16 @@ function filterCoffeeShops({
  * * implement caches in search
  */
 async function search({ 
-  text = "", 
+  text = "",
   byPricing = false, 
   byRatingAndRelevancy = false, 
-  byViewpoint = false, 
-  byDistance = false 
+  byLocation = false,
+  location,
+  distance,
+  pricing,
 }) {
   // if text length is lt 3, return empty
-  if (text.length < 3) {
+  if (text.length < 3 && !byLocation) {
     return [];
   }
 
@@ -213,18 +220,22 @@ async function search({
     }
   }
 
+  const byNeighbourhood = !!selectedNeighbourhood
+
   // get coffeeShops
   const coffeeShops = await getCoffeeShops();
 
   // get filtered coffee shops
   const filteredCoffeeShops = filterCoffeeShops({ 
     coffeeShops, 
-    byPricing,
     byRatingAndRelevancy,
-    byDistance,
-    byViewpoint,
-    byNeighbourhood: !!selectedNeighbourhood,
+    byLocation,
+    byNeighbourhood,
+    byPricing,
+    location,
+    distance,
     neighbourhood: selectedNeighbourhood,
+    pricing
   });
   
   // create searchList
@@ -238,7 +249,7 @@ async function search({
     if (
       filteredCoffeeShops[i].name.toLowerCase().includes(text.toLowerCase())
       ||
-      (!!selectedNeighbourhood && (filteredCoffeeShops[i].neighbourhood === selectedNeighbourhood))
+      (byNeighbourhood && (filteredCoffeeShops[i].neighbourhood === selectedNeighbourhood))
     ) {
       set.add(i);
       searchList.push(filteredCoffeeShops[i]);
