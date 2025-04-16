@@ -30,7 +30,7 @@ function unrenderCoffeeShopCard() {
   content.innerHTML = "";
 }
 
-function renderCoffeeShopCard(coffeeShop, isMapView = false, prev, next) {
+function renderCoffeeShopCard(coffeeShop, isMapView = false, prev, mobilePrev, next, mobileNext) {
   // https://stackoverflow.com/questions/30796141/parse-json-array-from-string
   const categories = coffeeShop
     .categories 
@@ -44,6 +44,8 @@ function renderCoffeeShopCard(coffeeShop, isMapView = false, prev, next) {
     <button class='close btn' role="close"><i data-lucide="x"></i></button>
     <div class='coffee-shop-card-header main-font-semibold'>
       <div class='img-container'></div>
+    </div>
+    <div class='coffee-shop-card-content'>
       <div class='coffee-shop-title'>
         <div class='coffee-shop-top-title'>
           <h2>${coffeeShop.name}</h2>
@@ -51,8 +53,6 @@ function renderCoffeeShopCard(coffeeShop, isMapView = false, prev, next) {
         </div>
         <div class='main-font-light address'><i class='icon' data-lucide="map-pin-house"></i> ${coffeeShop.store_add1 ? coffeeShop.store_add1 + ', ' : ''}${coffeeShop.neighbourhood}</div>
       </div>
-    </div>
-    <div class='coffee-shop-card-content'>
       <div class='badge-list'>
         ${
           categories.map(cat => {
@@ -86,8 +86,14 @@ function renderCoffeeShopCard(coffeeShop, isMapView = false, prev, next) {
   const pagination = document.createElement('div');
   pagination.className = 'pagination'
 
+  const paginationMobile = document.createElement('div');
+  paginationMobile.className = 'pagination-mobile'
+  
+  cardWrapper.appendChild(paginationMobile)
   cardWrapper.appendChild(cardContainer)
   cardWrapper.appendChild(pagination);
+  paginationMobile.appendChild(mobilePrev || document.createElement('div'));
+  paginationMobile.appendChild(mobileNext || document.createElement('div'));
   pagination.appendChild(prev || document.createElement('div'));
   pagination.appendChild(next || document.createElement('div'));
   return cardWrapper

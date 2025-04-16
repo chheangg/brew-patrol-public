@@ -28,8 +28,11 @@ async function loadMap() {
     filterOptions.location = { lat: globalMapObj.getCenter().lat, long: globalMapObj.getCenter().lng };
   })
 
-  // pan to current location
-  flyToCurrentLocation();
+  // if not yet search
+  if (!currentSearchList) {
+    // pan to current location
+    flyToCurrentLocation();
+  }
 }
 
 function renderFrontPageCoffeeShopList(coffeeShops = []) {
@@ -98,16 +101,32 @@ function renderCoffeeShopListOnMap() {
   const leftBtn = document.createElement('button');
   leftBtn.innerHTML = '<i data-lucide="chevron-left"></i>'
   leftBtn.className = 'left-btn btn';
+  const left2Btn = document.createElement('button');
+  left2Btn.innerHTML = '<i data-lucide="chevron-left"></i>'
+  left2Btn.className = 'left-btn btn';
   const rightBtn = document.createElement('button');
   rightBtn.innerHTML = '<i data-lucide="chevron-right"></i>'
   rightBtn.className = 'right-btn btn';
+  const right2Btn = document.createElement('button');
+  right2Btn.innerHTML = '<i data-lucide="chevron-right"></i>'
+  right2Btn.className = 'right-btn btn';
 
   leftBtn.addEventListener('click', (e) => {
     currentIndex--;
     renderCoffeeShopListOnMap();
   })
 
+  left2Btn.addEventListener('click', (e) => {
+    currentIndex--;
+    renderCoffeeShopListOnMap();
+  })
+
   rightBtn.addEventListener('click', (e) => {
+    currentIndex++;
+    renderCoffeeShopListOnMap();
+  })
+
+  right2Btn.addEventListener('click', (e) => {
     currentIndex++;
     renderCoffeeShopListOnMap();
   })
@@ -120,7 +139,9 @@ function renderCoffeeShopListOnMap() {
       currentCoffeeShop,
       true,
       currentIndex > 0 ? leftBtn : null,
-      currentIndex < currentSearchList.length - 1 ? rightBtn : null
+      currentIndex > 0 ? left2Btn : null,
+      currentIndex < currentSearchList.length - 1 ? rightBtn : null,
+      currentIndex < currentSearchList.length - 1 ? right2Btn : null
     )
   )
 
