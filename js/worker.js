@@ -10,7 +10,7 @@ async function getCoffeeShops() {
     return coffeeShops;
   }
   // use fetch api to grab data from json
-  const response = await fetch('../data/coffee_shop.json')
+  const response = await fetch('https://chheangg.github.io/brew-patrol/data/coffee_shop.json')
   coffeeShops = await response.json();
   // return json as array of obj
   return coffeeShops;
@@ -21,7 +21,7 @@ async function getNeighbourhoods() {
     return neighbourhoods;
   }
   // use fetch api to grab data from json
-  const response = await fetch('../data/neighbourhoods.json')
+  const response = await fetch('https://chheangg.github.io/brew-patrol/data/coffee_shop.json')
   neighbourhoods = await response.json()
   // return json as array of obj
   return neighbourhoods;
